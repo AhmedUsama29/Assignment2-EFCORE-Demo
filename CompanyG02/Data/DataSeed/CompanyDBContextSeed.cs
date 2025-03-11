@@ -14,16 +14,34 @@ namespace CompanyG02.Data.DataSeed
         public static void Seed(CompanyDBContext companyDBContext)
         {
 
-            var departmentsData = File.ReadAllText("C:\\Users\\ahmed\\OneDrive\\Desktop\\efcore demo\\CompanyG02Solution\\CompanyG02\\Data\\DataSeed\\departments.json");
-            var departments = JsonSerializer.Deserialize<List<Department>>(departmentsData);
-
-            if (departments?.Count > 0)
+            if (!companyDBContext.Departments.Any())
             {
-                foreach (var department in departments)
+                var departmentsData = File.ReadAllText("C:\\Users\\ahmed\\OneDrive\\Desktop\\efcore demo\\CompanyG02Solution\\CompanyG02\\Data\\DataSeed\\departments.json");
+                var departments = JsonSerializer.Deserialize<List<Department>>(departmentsData);
+
+                if (departments?.Count > 0)
                 {
-                    companyDBContext.Departments.Add(department);
+                    foreach (var department in departments)
+                    {
+                        companyDBContext.Departments.Add(department);
+                    }
+                    companyDBContext.SaveChanges();
                 } 
-                companyDBContext.SaveChanges();
+            }
+
+            if (!companyDBContext.Employees.Any())
+            {
+                var employeeData = File.ReadAllText("C:\\Users\\ahmed\\OneDrive\\Desktop\\efcore demo\\CompanyG02Solution\\CompanyG02\\Data\\DataSeed\\employees.json");
+                var employees = JsonSerializer.Deserialize<List<Employee>>(employeeData);
+
+                if (employees?.Count > 0)
+                {
+                    foreach (var emp in employees)
+                    {
+                        companyDBContext.Employees.Add(emp);
+                    }
+                    companyDBContext.SaveChanges();
+                }
             }
         }
 

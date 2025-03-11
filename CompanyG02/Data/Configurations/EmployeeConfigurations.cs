@@ -20,6 +20,8 @@ namespace CompanyG02.Data.Configurations
                       .HasDefaultValue("Cairo");//Column Not In Model
 
             builder.OwnsOne(e => e.DetaildAddress);
+
+            builder.Property(e => e.Id).UseIdentityColumn();
         }
     }
 }

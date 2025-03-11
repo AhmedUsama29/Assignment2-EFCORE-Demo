@@ -1,5 +1,7 @@
 ﻿using CompanyG02.Data;
 using CompanyG02.Data.DataSeed;
+using CompanyG02.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompanyG02
 {
@@ -70,6 +72,89 @@ namespace CompanyG02
 
 
             }
+            using (var context = new CompanyDBContext())
+            {
+                //var emp = (from e in context.Employees
+                //           where e.Id == 3
+                //           select e).FirstOrDefault();
+
+                var emp = (from e in context.Employees
+                           .Include(e => e.Department)
+                           where e.Id == 3
+                           select e).FirstOrDefault();
+
+
+                context.Entry(emp).Reference(nameof(Employee.Department)).Load();
+
+                if (emp is not null)
+                {
+                    Console.WriteLine($"Employee: {emp.Name}, Department: {emp.Department?.Name ?? "No Department"}");
+                }
+
+
+                var dept = (from d in context.Departments
+                            .Include(d => d.DepartmentId)
+                            where d.DepartmentId == 1
+                            select d).FirstOrDefault();
+
+                if (dept is not null)
+                {
+                    Console.WriteLine($"Department: {dept.DepartmentId}, Department Name: {dept?.Name}");
+
+                    foreach (var instructor in dept.Employees)
+                    {
+                        Console.WriteLine($"Instructor: {instructor.Name}");
+                    }
+                }
+
+                var res = from d in context.Departments
+                          join e in context.Employees
+                          on d.DepartmentId equals e.DepartmentId
+                          select new
+                          {
+                              EmployeeId = e.Id,
+                              EmployeeName = e.Name,
+                              DepartmentId = d.DepartmentId,
+                              DepartmentName = d.Name,
+                          };
+
+                res = context.Departments.Join(
+                context.Employees,
+                d => d.DepartmentId,
+                e => e.DepartmentId,
+                (d, e) => new
+                {
+                    EmployeeId = e.Id,
+                    EmployeeName = e.Name,
+                    DepartmentId = d.DepartmentId,
+                    DepartmentName = d.Name,
+                });
+
+                foreach (var item in res)
+                {
+                    Console.WriteLine($"Employee ID: {item.EmployeeId}, Employee Name: {item.EmployeeName}, Department ID: {item.DepartmentId}, Department Name: {item.DepartmentName}");
+                }
+
+
+                var groupJoinRes = context.Departments.GroupJoin(
+                    context.Employees,
+                    d => d.ManagerId,
+                    e => e.DepartmentId,
+                    (department, employees) => new { department, employees });
+
+                foreach (var item in groupJoinRes)
+                {
+                    Console.WriteLine($"Department: {item.department.DepartmentId}, {item.department.Name}");
+                    foreach (var employee in item.employees)
+                    {
+                        Console.WriteLine($" ---Employee: {employee.Id}, {employee.Name}");
+                    }
+                }
+
+
+            }
+
+
         }
     }
 }

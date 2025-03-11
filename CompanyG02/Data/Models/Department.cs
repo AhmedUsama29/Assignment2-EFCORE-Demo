@@ -10,6 +10,7 @@ namespace CompanyG02.Data.Models
 {
     internal class Department
     {
+
         public int DepartmentId { get; set; }
         public required string Name { get; set; }
         public DateOnly CreationDate { get; set; }
@@ -26,8 +27,12 @@ namespace CompanyG02.Data.Models
 
         #region One To One Relationship (Manage)
 
+        public int? Instructorid { get; set; }
+
 
         [ForeignKey("Manager")]
+
+
         public int? ManagerId { get; set; }
         [InverseProperty(nameof(Employee.ManagedDepartment))]
         public Employee? Manager { get; set; }
